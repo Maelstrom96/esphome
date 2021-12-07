@@ -184,19 +184,21 @@ sensor:
     phases:
       - id: phase_a
         input: BLACK
-        voltage: 
-          name: "Phase A Voltage"
       - id: phase_c
         input: RED
         voltage: 
           name: "Phase C Voltage"
     ct_clamps:
-      - name: "A"
-        phase_id: phase_a
+      - phase_id: phase_a
         input: "A"
-      - name: "C"
-        phase_id: phase_c
+        power:
+          name: "A Power"
+        current:
+          name: "A Current"
+      - phase_id: phase_c
         input: "C"
+        power:
+          name: "C Power"
 
 script:
   - id: automation_test
