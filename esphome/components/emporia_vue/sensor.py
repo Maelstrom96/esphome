@@ -25,7 +25,7 @@ CONF_PHASE_ID = "phase_id"
 CONF_SENSOR_POLL_INTERVAL = "sensor_poll_interval"
 
 CODEOWNERS = ["@flaviut", "@Maelstrom96", "@krconv"]
-ESP_PLATFORMS = ["esp-idf"]
+ESP_PLATFORMS = ["esp-idf", "arduino"]
 DEPENDENCIES = ["i2c"]
 AUTOLOAD = ["sensor"]
 

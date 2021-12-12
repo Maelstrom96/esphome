@@ -1,11 +1,12 @@
 #pragma once
 
+#include "esphome/core/defines.h"
+
 #ifdef USE_ESP32
 
 #include <vector>
 
 #include "esphome/core/component.h"
-#include "esphome/core/defines.h"
 #include "esphome/components/i2c/i2c.h"
 #include "esphome/components/sensor/sensor.h"
 
@@ -65,6 +66,7 @@ class EmporiaVueComponent : public Component, public i2c::I2CDevice {
   static void i2c_request_task(void *pv);
 
   uint32_t sensor_poll_interval_;
+  uint8_t last_sequence_num_ = 0;
   std::vector<PhaseConfig *> phases_;
   std::vector<CTClampConfig *> ct_clamps_;
   QueueHandle_t i2c_data_queue_;

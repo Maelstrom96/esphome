@@ -93,12 +93,12 @@ void EmporiaVueComponent::i2c_request_task(void *pv) {
       ESP_LOGV(TAG, "Ignoring sensor reading that is marked as read");
     } else {
       if (last_sequence_num && sensor_reading.sequence_num > last_sequence_num + 1) {
-        ESP_LOGW(TAG, "Detected %d missing reading(s), data may not be accurate!",
+        ESP_LOGW(TAG, "i2c_read_task - Detected %d missing reading(s), data may not be accurate!",
                  sensor_reading.sequence_num - last_sequence_num - 1);
       }
 
       xQueueOverwrite(global_emporia_vue_component->i2c_data_queue_, &sensor_reading);
-      ESP_LOGV(TAG, "Added sensor reading with sequence number %d to queue", sensor_reading.sequence_num);
+      ESP_LOGD(TAG, "Added sensor reading with sequence number %d to queue", sensor_reading.sequence_num);
 
       last_sequence_num = sensor_reading.sequence_num;
     }
@@ -110,14 +110,20 @@ void EmporiaVueComponent::loop() {
   SensorReading sensor_reading;
 
   if (xQueueReceive(this->i2c_data_queue_, &sensor_reading, 0) == pdTRUE) {
-    ESP_LOGV(TAG, "Received sensor reading with sequence number %d from queue", sensor_reading.sequence_num);
-    for (auto *phase : this->phases_) {
+    ESP_LOGD(TAG, "Received sensor reading with sequence number %d from queue", sensor_reading.sequence_num);
+    if (this->last_sequence_num_ && sensor_reading.sequence_num > this->last_sequence_num_ + 1) {
+      ESP_LOGW(TAG, "loop - Detected %d missing reading(s), data may not be accurate!",
+                sensor_reading.sequence_num - this->last_sequence_num_ - 1);
+    }
+    for (PhaseConfig *phase : this->phases_) {
       phase->update_from_reading(sensor_reading);
     }
 
     for (auto *ct_clamp : this->ct_clamps_) {
       ct_clamp->update_from_reading(sensor_reading);
     }
+
+    this->last_sequence_num_ = sensor_reading.sequence_num;
   }
 }
 
