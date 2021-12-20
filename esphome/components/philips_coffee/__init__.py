@@ -30,13 +30,8 @@ CONFIG_SCHEMA = cv.Schema(
 async def to_code(config):
     var = cg.new_Pvariable(config[CONF_ID])
     await cg.register_component(var, config)
-    await register_uart_device(var, config, CONF_UART_SCREEN, "set_uart_screen")
-    await register_uart_device(var, config, CONF_UART_CONTROLLER, "set_uart_controller")
-
-
-# Redefining the register_uart_device function since we can't overwrite the config key and function.
-async def register_uart_device(
-    var, config, config_key=CONF_UART_ID, config_function="set_uart_parent"
-):
-    parent = await cg.get_variable(config[config_key])
-    cg.add(var[config_function](parent))
+    uart_screen = await cg.get_variable(config[CONF_UART_SCREEN])
+    cg.add(var.set_uart_screen(uart_screen))
+    uart_controller = await cg.get_variable(config[CONF_UART_CONTROLLER])
+    cg.add(var.set_uart_controller(uart_controller))
+    cg.add_define("USE_UART_DEBUGGER")
